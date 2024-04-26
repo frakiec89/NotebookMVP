@@ -1,6 +1,6 @@
 ﻿using NotebookMVP.Core;
 using System.Text;
-// track
+// nocopy
 namespace NotebookMVP.BL
 {
    
@@ -60,7 +60,7 @@ namespace NotebookMVP.BL
         {
             try
             {
-                File.WriteAllText(content, path, encoding);
+                File.WriteAllText( path, content,  encoding);
             }
             catch (Exception ex)
             {

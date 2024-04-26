@@ -1,59 +1,52 @@
-﻿// track
+﻿// nocopy
 using NotebookMVP.Core;
 
 namespace NotebookMVP.MyWPF
 {
-    public class MyPresenter
+    public class MyPresenter : MyPresenterBase
     {
-        private string _titledef = "Блокнот (sgk) ";
-
-        private Core.ITXTFileService _service;
-        private Core.IMainWindows _ui;
-        private Core.IMessageService _message;
-
-        public MyPresenter(ITXTFileService service, IMainWindows ui, IMessageService message)
+        public MyPresenter(ITXTFileService service, IMainWindows ui, IMessageService message) 
+            : base(service, ui, message) 
         {
-            _service = service;
-            _ui = ui;
-            _message = message;
-            _ui.FileSave += _ui_FileSave;
-            _ui.FileOpen += _ui_FileOpen;
+        
         }
+      
 
-        private void _ui_FileOpen(object? sender, EventArgs e)
+        protected override void _ui_FileOpen(object? sender, EventArgs e)
         {
-            try
+            try 
             {
                 string path = _ui.Path;
                 string content = _service.GetContent(path);
+
                 if (string.IsNullOrEmpty(content))
                 {
-                   _message.SendMessage("Файл загружен, но он пустой" , MessageType.Warning);
+                    _message.SendMessage("Открыли пустой файл", MessageType.Warning);
                 }
+
                 _ui.Content = content;
-                _ui.Title = _titledef + path ;
-               
-            }
+                _ui.Title = base._titledef + " " + _ui.Path;
+            } 
             catch (Exception ex)
             {
-                _message.SendMessage(ex.Message, MessageType.Error);
+                _message.SendMessage("Error \n" + ex.Message, MessageType.Error);
             }
         }
 
-        private void _ui_FileSave(object? sender, EventArgs e)
+        protected override void _ui_FileSave(object? sender, EventArgs e)
         {
             try
             {
-                string path = _ui.Path;
-                string content = _ui.Content; 
-                _service.SaveContent(path, content);
-                _message.SendMessage("Текст успешно сохранился в файле", MessageType.Info);
+                _service.SaveContent(_ui.Content, _ui.Path);
+                _message.SendMessage
+                    ($"Файл успешно  сохранен  в дерикторию:{_ui.Path}" , MessageType.Info);
+                _ui.Title = base._titledef + " save";
+
             }
             catch (Exception ex)
             {
-                _message.SendMessage(ex.Message, MessageType.Error);
+                _message.SendMessage("Error \n" + ex.Message, MessageType.Error);
             }
-
         }
     }
 }
